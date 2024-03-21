@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack</title>
+    <style>
+        #game {
+            text-align: center;
+        }
+        #player-cards, #dealer-cards {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .card {
+            width: 80px;
+            height: 120px;
+            background-color: white;
+            border: 1px solid black;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        #result {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="game">
+        <h1>Blackjack</h1>
+        <div id="dealer-cards"></div>
+        <div id="player-cards"></div>
+        <button id="hit">Hit</button>
+        <button id="stand">Stand</button>
+        <div id="result"></div>
+    </div>
+    <script>
+        const suits = ['♠', '♣', '♥', '♦'];
+        const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+
+        let deck = [];
+        let dealerCards = [];
+        let playerCards = [];
+        let dealerScore = 0;
+        let playerScore = 0;
+
+        const dealerCardsElement = document.getElementById('dealer-cards');
+        const playerCardsElement = document.getElementById('player-cards');
+        const resultElement = document.getElementById('result');
+        const hitButton = document.getElementById('hit');
+        const standButton = document.getElementById('stand');
+
+        function initializeDeck() {
+            deck = [];
+            for (let suit of suits) {
+                for (let value of values) {
+                    deck.push({ suit, value });
+                }
+            }
+            shuffleDeck();
+        }
+
+        function shuffleDeck() {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
+
+        function dealCard() {
+            return deck.pop();
+        }
+
+        function renderCard(card, element) {
+            const cardElement = document.createElement('div');
+            cardElement.classList.add('card');
+            cardElement.textContent = `${card.value}${card.suit}`;
+            element.appendChild(cardElement);
+        }
+
+        function calculateScore(cards) {
+            let score = 0;
+            let hasAce = false;
+            for (let card of cards) {
+                if (card.value === 'A') {
+                    hasAce = true;
+                }
+                score += getValue(card.value);
+            }
+            if (hasAce && score <= 11) {
+                score += 10;
+            }
+            return score;
+        }
+
+        function getValue(value) {
+            switch (value) {
+                case 'J':
+                case 'Q':
+                case 'K':
+                    return 10;
+                case 'A':
+                    return 1;
+                default:
+                    return parseInt(value);
+            }
+        }
+
+        function initializeGame() {
+            initializeDeck();
+            dealerCards = [dealCard(), dealCard()];
+            playerCards = [dealCard(), dealCard()];
+            dealerCardsElement.innerHTML = '';
+            playerCardsElement.innerHTML = '';
+            renderCard(dealerCards[0], dealerCardsElement);
+            renderCard(dealerCards[1], dealerCardsElement);
+            renderCard(playerCards[0], playerCardsElement);
+            renderCard(playerCards[1], playerCardsElement);
+            dealerScore = calculateScore(dealerCards);
+            playerScore = calculateScore(playerCards);
+            hitButton.disabled = false;
+            standButton.disabled = false;
+            resultElement.textContent = '';
+        }
+
+        function checkResult() {
+            if (playerScore > 21) {
+                return 'Você perdeu!';
+            } else if (dealerScore > 21) {
+                return 'Você ganhou!';
+            } else if (playerScore === dealerScore) {
+                return 'Empate!';
+            } else if (playerScore > dealerScore) {
+                return 'Você ganhou!';
+            } else {
+                return 'Você perdeu!';
+            }
+        }
+
+        function playDealerTurn() {
+            while (dealerScore < 17) {
+                const card = dealCard();
+                dealerCards.push(card);
+                renderCard(card, dealerCardsElement);
+                dealerScore = calculateScore(dealerCards);
+            }
+            const result = checkResult();
+            resultElement.textContent = result;
+            hitButton.disabled = true;
+            standButton.disabled = true;
+        }
+
+        function hit() {
+            const card = dealCard();
+            playerCards.push(card);
+            renderCard(card, playerCardsElement);
+            playerScore = calculateScore(playerCards);
+            if (playerScore > 21) {
+                const result = checkResult();
+                resultElement.textContent = result;
+                hitButton.disabled = true;
+                standButton.disabled = true;
+            }
+        }
+
+        function stand() {
+            playDealerTurn();
+        }
+
+        initializeGame();
+
+        hitButton.addEventListener('click', hit);
+        standButton.addEventListener('click', stand);
+    </script>
+</body>
+</html>

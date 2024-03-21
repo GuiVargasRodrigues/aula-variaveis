@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Velha</title>
+    <style>
+        .cell {
+            width: 100px;
+            height: 100px;
+            border: 1px solid black;
+            display: inline-block;
+            font-size: 48px;
+            text-align: center;
+            line-height: 100px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Jogo da Velha</h1>
+    <div id="board">
+        <div class="cell" onclick="makeMove(0)"></div>
+        <div class="cell" onclick="makeMove(1)"></div>
+        <div class="cell" onclick="makeMove(2)"></div>
+        <br>
+        <div class="cell" onclick="makeMove(3)"></div>
+        <div class="cell" onclick="makeMove(4)"></div>
+        <div class="cell" onclick="makeMove(5)"></div>
+        <br>
+        <div class="cell" onclick="makeMove(6)"></div>
+        <div class="cell" onclick="makeMove(7)"></div>
+        <div class="cell" onclick="makeMove(8)"></div>
+    </div>
+    <script>
+        let currentPlayer = 'X';
+        let gameOver = false;
+        let board = ['', '', '', '', '', '', '', '', ''];
+
+        function makeMove(index) {
+            if (!gameOver && board[index] === '') {
+                board[index] = currentPlayer;
+                document.getElementsByClassName('cell')[index].innerText = currentPlayer;
+                checkWinner();
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            }
+        }
+
+        function checkWinner() {
+            const winningCombos = [
+                [0, 1, 2],
+                [3, 4, 5],
+                [6, 7, 8],
+                [0, 3, 6],
+                [1, 4, 7],
+                [2, 5, 8],
+                [0, 4, 8],
+                [2, 4, 6]
+            ];
+
+            for (let combo of winningCombos) {
+                const [a, b, c] = combo;
+                if (board[a] !== '' && board[a] === board[b] && board[b] === board[c]) {
+                    gameOver = true;
+                    alert(`Jogador ${currentPlayer} venceu!`);
+                    break;
+                }
+            }
+
+            if (!board.includes('') && !gameOver) {
+                gameOver = true;
+                alert('Empate!');
+            }
+        }
+    </script>
+</body>
+</html>
