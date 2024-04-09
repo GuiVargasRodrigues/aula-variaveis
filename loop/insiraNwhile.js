@@ -1,19 +1,13 @@
-const readline = require('readline');
-
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
-let soma = 0;
-let numero = 1; 
-
-console.log("Insira números. Digite 0 para finalizar.");
-
-while (numero !== 0) {
-    numero = Number(rl.question("Insira um número: "));
-    soma += numero;
+const readlineSync = require('readline-sync');
+function calcularSomaDosNumeros() {
+    let soma = 0
+    let input
+    console.log("Digite os numeros (Digite '0' para parar:");
+    while (input !== 0) {
+        input = Number(readlineSync.question("Numero:"));
+        soma += input;
+    }
+    return soma;
 }
-
-console.log("A soma dos números é:", soma);
-rl.close(); 
+const somaTotal = calcularSomaDosNumeros();
+console.log("A soma dos numeros é:", somaTotal);
